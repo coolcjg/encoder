@@ -27,7 +27,16 @@ public class ApiService {
 		batch.setMediaId(batchDTO.getMediaId());
 		batch.setType(batchDTO.getType());
 		batch.setStatus(EncodingStatus.WAITING.getName());
-		batch.setOriginalFile(batchDTO.getOriginalFile());
+		
+		int index = batchDTO.getOriginalFile().lastIndexOf("/");
+		String originalFilePath = batchDTO.getOriginalFile().substring(0, index+1);
+		batch.setOriginalFilePath(originalFilePath);
+		batch.setOriginalFileName(batchDTO.getOriginalFile().substring(index+1));
+		
+		String encodingFilePath = originalFilePath.replaceAll("original", "encoding");
+		batch.setEncodingFilePath(encodingFilePath);
+		batch.setEncodingFileName(batchDTO.getMediaId() + ".mp4");
+		
 		batch.setReturnUrl(batchDTO.getReturnUrl());
 		
 		batchRepository.save(batch);	

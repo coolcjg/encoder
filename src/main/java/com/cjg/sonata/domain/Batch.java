@@ -34,9 +34,11 @@ public class Batch {
 	@Column(nullable = false, length = 8)
 	private String status;
 	
-	private String originalFile;
+	private String originalFilePath;
+	private String originalFileName;
 	
-	private String encodingFile;
+	private String encodingFilePath;
+	private String encodingFileName;
 	
 	private String thumbPath;
 	
