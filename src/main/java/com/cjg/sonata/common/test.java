@@ -1,4 +1,4 @@
-package com.cjg.sonata.comm;
+package com.cjg.sonata.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
