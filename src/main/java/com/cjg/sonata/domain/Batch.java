@@ -42,7 +42,7 @@ public class Batch {
 	private String encodingFilePath;
 	private String encodingFileName;
 	
-	private String thumbPath;
+	private String thumbnailPath;
 	
 	private String returnUrl;
 

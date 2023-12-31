@@ -57,9 +57,11 @@ public class Media {
 	
 	private String encodingFilePath;
 	
-	private String encodingFileName;	
+	private String encodingFileName;
 	
 	private Long encodingFileSize;
+	
+	private String thumbnailPath;
 	
 	private String thumbPath;
 	
