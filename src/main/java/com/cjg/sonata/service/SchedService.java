@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.cjg.sonata.common.EncodingStatus;
+import com.cjg.sonata.common.HttpRequestUtil;
 import com.cjg.sonata.domain.Batch;
 import com.cjg.sonata.domain.Media;
 import com.cjg.sonata.repository.BatchRepository;
@@ -36,6 +39,9 @@ public class SchedService {
 	
 	@Autowired
 	MediaRepository mediaRepository;
+	
+	@Autowired
+	HttpRequestUtil httpRequestUtil;
 	
 	public void encoding() {
 		
@@ -149,8 +155,8 @@ public class SchedService {
 				thumbnailArgList.add("-vframes");
 				thumbnailArgList.add("1");
 				
-				String thumbnailOutput = batch.getEncodingFilePath() + batch.getMediaId() + ".jpg";
-				thumbnailArgList.add(thumbnailOutput);
+				String thumbnailPath = batch.getEncodingFilePath() + batch.getMediaId() + ".jpg";
+				thumbnailArgList.add(thumbnailPath);
 				
 				logger.info("FFMPEG THUMBNAIL PARAM LIST : " + thumbnailArgList);				
 				
@@ -165,9 +171,27 @@ public class SchedService {
 				logger.info("FFMPEG thumbnail exitValue : " + exitValue2);
 				
 				if(exitValue2 == 0) {
-					batch.setThumbPath(thumbnailOutput);
+					batch.setThumbnailPath(thumbnailPath);
 					batch.setStatus(EncodingStatus.SUCCESS.getName());
 					batchRepository.save(batch);
+					
+					String returnUrl = batch.getReturnUrl();
+					if(returnUrl != null && !returnUrl.equals("")) {
+						Map<String,String> param = new HashMap();
+						param.put("mediaId", batch.getMediaId()+"");
+						param.put("encodingFileName", batch.getEncodingFileName());
+						param.put("encodingFilePath", batch.getEncodingFilePath());
+						
+						File encodingFile = new File(batch.getEncodingFilePath() + batch.getEncodingFileName());
+						param.put("encodingFileSize", encodingFile.length() + "");
+						
+						param.put("thumbnailPath", thumbnailPath);
+						
+						param.put("status", EncodingStatus.SUCCESS.getName());
+						
+						httpRequestUtil.encodingRequest(returnUrl, param);
+					}
+					
 				}else {
 					encodingFail(batch, media);
 				}

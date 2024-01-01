@@ -35,7 +35,6 @@ public class ApiService {
 		String type = ffprobeUtil.getType(batchDTO.getOriginalFile());
 		System.out.println("----------------type : " + type);
 		
-		
 		batch.setType("video");
 		batch.setStatus(EncodingStatus.WAITING.getName());
 		

@@ -25,11 +25,14 @@ public class Sched {
 	 * ? : 설정 값 없음.(날짜, 요일에서만 사용 가능)
 	 */
 	
+	
 	@Scheduled(fixedDelay = 10000)
 	public void scheduleTaskUsingCronExpression() {
 		
 		System.out.println("함수 실행");
 		schedService.encoding();
 	}
+	
+	
 	
 }

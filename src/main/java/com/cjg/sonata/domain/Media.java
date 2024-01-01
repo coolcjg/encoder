@@ -53,7 +53,6 @@ public class Media {
 		
 	@Column(nullable = false)
 	private Long originalFileSize;
-		
 	
 	private String encodingFilePath;
 	
@@ -62,8 +61,6 @@ public class Media {
 	private Long encodingFileSize;
 	
 	private String thumbnailPath;
-	
-	private String thumbPath;
 	
 	@Column(nullable = false, length = 3)
 	private int percent;

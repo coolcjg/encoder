@@ -23,6 +23,7 @@ public class Batch {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long batchId;
 	
+	@Column(nullable = false)
 	private Long mediaId;
 	
 	@CreationTimestamp
