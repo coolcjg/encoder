@@ -21,7 +21,7 @@ public class HttpRequestUtil {
 	
 	Logger logger = LoggerFactory.getLogger(HttpRequestUtil.class);
 	
-	public String encodingRequest(String urlParam, Map<String, String> map) {
+	public String encodingRequest(String urlParam, Map<String, Object> map) {
 		
 		logger.info("encodingRequest PARAM : " + map);
 		

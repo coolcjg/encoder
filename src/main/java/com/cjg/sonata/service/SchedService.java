@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import com.cjg.sonata.common.EncodingStatus;
 import com.cjg.sonata.common.HttpRequestUtil;
 import com.cjg.sonata.domain.Batch;
-import com.cjg.sonata.domain.Media;
 import com.cjg.sonata.repository.BatchRepository;
-import com.cjg.sonata.repository.MediaRepository;
 
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
@@ -38,9 +36,6 @@ public class SchedService {
 	BatchRepository batchRepository;
 	
 	@Autowired
-	MediaRepository mediaRepository;
-	
-	@Autowired
 	HttpRequestUtil httpRequestUtil;
 	
 	public void encoding() {
@@ -52,8 +47,6 @@ public class SchedService {
 		}
 		
 		for(Batch batch : batchList) {
-			
-			Media media = mediaRepository.findByMediaId(batch.getMediaId());
 			
 			try {
 				
@@ -115,7 +108,6 @@ public class SchedService {
 				pb.redirectErrorStream(true);
 				
 				//타겟 하나 잡기
-				
 				Process process = pb.start();
 				
 				InputStreamReader in = new InputStreamReader(process.getInputStream());
@@ -126,7 +118,7 @@ public class SchedService {
 					logger.info("line : " + line);
 					
 					if(line != null && line.contains("frame=")){
-						updatePercent(media, frames, line);
+						encodingPercent(batch, frames, line);
 					}
 					
 				}
@@ -134,7 +126,7 @@ public class SchedService {
 				int exitValue = process.exitValue();				
 				if(exitValue != 0) {					
 					logger.error("FFMPEG encoding exitValue : " + exitValue);
-					encodingFail(batch, media);
+					encodingFail(batch);
 					return;
 				}
 				
@@ -177,28 +169,16 @@ public class SchedService {
 					
 					String returnUrl = batch.getReturnUrl();
 					if(returnUrl != null && !returnUrl.equals("")) {
-						Map<String,String> param = new HashMap();
-						param.put("mediaId", batch.getMediaId()+"");
-						param.put("encodingFileName", batch.getEncodingFileName());
-						param.put("encodingFilePath", batch.getEncodingFilePath());
-						
-						File encodingFile = new File(batch.getEncodingFilePath() + batch.getEncodingFileName());
-						param.put("encodingFileSize", encodingFile.length() + "");
-						
-						param.put("thumbnailPath", thumbnailPath);
-						
-						param.put("status", EncodingStatus.SUCCESS.getName());
-						
-						httpRequestUtil.encodingRequest(returnUrl, param);
+						encodingSuccess(batch);
 					}
 					
 				}else {
-					encodingFail(batch, media);
+					encodingFail(batch);
 				}
 			
 			}catch(IOException | InterruptedException e ) {
 				logger.info("ERROR : " + e);
-				encodingFail(batch, media);
+				encodingFail(batch);
 				continue;
 			};				
 			
@@ -206,21 +186,45 @@ public class SchedService {
 		
 	}
 	
-	private void encodingFail(Batch batch, Media media) {
+	private void encodingFail(Batch batch) {
 		batch.setStatus(EncodingStatus.FAIL.getName());
-		batchRepository.save(batch);				
+		batchRepository.save(batch);
 		
-		media.setStatus(EncodingStatus.FAIL.getName());
-		mediaRepository.save(media);
+		Map<String, Object> param = new HashMap();
+		param.put("mediaId", batch.getMediaId());
+		param.put("status", EncodingStatus.FAIL.getName());
+		httpRequestUtil.encodingRequest(batch.getReturnUrl(), param);
 	}
 	
-	private void updatePercent(Media media, Long frames, String line) {
+	private void encodingSuccess(Batch batch) {
+		
+		Map<String,Object> param = new HashMap();
+		param.put("mediaId", batch.getMediaId());
+		param.put("status", EncodingStatus.SUCCESS.getName());
+		param.put("encodingFileName", batch.getEncodingFileName());
+		param.put("encodingFilePath", batch.getEncodingFilePath());
+		
+		File encodingFile = new File(batch.getEncodingFilePath() + batch.getEncodingFileName());
+		param.put("encodingFileSize", encodingFile.length() + "");
+		
+		param.put("thumbnailPath", batch.getThumbnailPath());
+		
+		httpRequestUtil.encodingRequest(batch.getReturnUrl(), param);		
+		
+	}
+	
+	private void encodingPercent(Batch batch, Long frames, String line) {
 		Long currentFrame =  Long.parseLong(line.split("\s+")[1]);		
 		int percent = (int)((currentFrame*1.0) / (frames*1.0) * 100.0);
 		
 		logger.info("currentFrame : " + currentFrame + ", percent : " + percent);
-		media.setPercent(percent);
-		mediaRepository.save(media);
+		
+		Map<String,Object> param = new HashMap();
+		param.put("mediaId", batch.getMediaId());
+		param.put("status", EncodingStatus.ENCODING.getName());
+		param.put("percent", percent);
+		
+		httpRequestUtil.encodingRequest(batch.getReturnUrl(), param);
 		
 	}
 
