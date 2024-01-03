@@ -76,9 +76,6 @@ public class HttpRequestUtil {
 			logger.error("ERROR : ", e);
 		}
 		
-		System.out.println("POST RESULT");
-		System.out.println(myResult);
-		
 		return myResult;
 		
 	}	

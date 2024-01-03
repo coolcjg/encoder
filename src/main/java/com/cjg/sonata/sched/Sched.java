@@ -28,8 +28,6 @@ public class Sched {
 	
 	@Scheduled(fixedDelay = 10000)
 	public void scheduleTaskUsingCronExpression() {
-		
-		System.out.println("함수 실행");
 		schedService.encoding();
 	}
 	
