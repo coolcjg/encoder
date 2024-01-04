@@ -3,6 +3,8 @@ package com.cjg.sonata.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,7 @@ import com.cjg.sonata.repository.BatchRepository;
 @Transactional
 public class ApiService {
 	
-	
+	Logger logger = LoggerFactory.getLogger(ApiService.class);
 	
 	@Autowired
 	BatchRepository batchRepository;
@@ -27,15 +29,15 @@ public class ApiService {
 	FFprobeUtil ffprobeUtil;	
 	
 	public Map<String, Object> batchInsert(BatchDTO batchDTO){
+		
+		logger.info("batchInsert batchDTO : " + batchDTO.toString());
+		
 		Map<String, Object> result = new HashMap<String, Object>();
+		String type = batchDTO.getType();
 		
 		Batch batch = new Batch();
 		batch.setMediaId(batchDTO.getMediaId());
-		
-		String type = ffprobeUtil.getType(batchDTO.getOriginalFile());
-		System.out.println("----------------type : " + type);
-		
-		batch.setType(batch.getType());
+		batch.setType(type);
 		batch.setStatus(EncodingStatus.WAITING.getName());
 		
 		int index = batchDTO.getOriginalFile().lastIndexOf("/");
@@ -45,11 +47,18 @@ public class ApiService {
 		
 		String encodingFilePath = originalFilePath.replaceAll("original", "encoding");
 		batch.setEncodingFilePath(encodingFilePath);
-		batch.setEncodingFileName(batchDTO.getMediaId() + ".mp4");
+		
+		if(type.equals("video")) {
+			batch.setEncodingFileName(batchDTO.getMediaId() + ".mp4");
+		}else if(type.equals("audio")) {
+			batch.setEncodingFileName(batchDTO.getMediaId() + ".mp3");
+		}else if(type.equals("image")) {
+			batch.setEncodingFileName(batchDTO.getMediaId() + ".jpg");
+		}
 		
 		batch.setReturnUrl(batchDTO.getReturnUrl());
 		
-		batchRepository.save(batch);	
+		batchRepository.save(batch);
 
 		result.put("code", HttpStatus.CREATED.value());
 		result.put("message", "success");

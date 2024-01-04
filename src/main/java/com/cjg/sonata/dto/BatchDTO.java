@@ -11,4 +11,6 @@ public class BatchDTO {
 	
 	private String returnUrl;
 	
+	private String type;
+	
 }
