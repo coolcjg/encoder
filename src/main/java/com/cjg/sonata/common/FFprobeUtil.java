@@ -19,8 +19,8 @@ public class FFprobeUtil {
 	final String[] VIDEO_CODEC = {"h264"};
 	final String[] AUDIO_CODEC = {"aac"};
 	
-	@Value("${encoderPath}")
-	private String encoderPath;
+	@Value("${ffmpegEncoderPath}")
+	private String ffmpegEncoderPath;
 	
 	public String getType(String path) {
 		
@@ -28,7 +28,7 @@ public class FFprobeUtil {
 		
 		try {
 		
-			FFprobe ffprobe = new FFprobe(encoderPath + "ffprobe.exe");
+			FFprobe ffprobe = new FFprobe(ffmpegEncoderPath + "ffprobe.exe");
 			
 			FFmpegProbeResult probeResult = ffprobe.probe(path);
 			

@@ -29,8 +29,11 @@ public class SchedService {
 	
 	Logger logger = LoggerFactory.getLogger(SchedService.class);
 	
-	@Value("${encoderPath}")
-	private String encoderPath;
+	@Value("${ffmpegEncoderPath}")
+	private String ffmpegEncoderPath;
+	
+	@Value("${imageEncoderPath}")
+	private String imageEncoderPath;	
 	
 	@Autowired
 	BatchRepository batchRepository;
@@ -66,7 +69,7 @@ public class SchedService {
 			
 			Long frames = 0l;
 			
-			FFprobe ffprobe = new FFprobe(encoderPath + "ffprobe.exe");
+			FFprobe ffprobe = new FFprobe(ffmpegEncoderPath + "ffprobe.exe");
 			FFmpegProbeResult probeResult = ffprobe.probe(batch.getOriginalFilePath() + batch.getOriginalFileName());
 			FFmpegStream stream = probeResult.getStreams().get(0);
 			frames = stream.nb_frames;
@@ -90,7 +93,7 @@ public class SchedService {
 			
 			List<String> list = new ArrayList();
 			
-			list.add(encoderPath + "ffmpeg.exe");
+			list.add(ffmpegEncoderPath + "ffmpeg.exe");
 			list.add("-y");
 			
 			list.add("-loglevel");
@@ -146,7 +149,7 @@ public class SchedService {
 			
 			List<String> thumbnailArgList = new ArrayList();
 			
-			thumbnailArgList.add(encoderPath + "ffmpeg.exe");
+			thumbnailArgList.add(ffmpegEncoderPath + "ffmpeg.exe");
 			thumbnailArgList.add("-y");
 			
 			thumbnailArgList.add("-loglevel");
@@ -198,6 +201,83 @@ public class SchedService {
 	}
 	
 	private void encodingAudio(Batch batch) {
+
+		try {
+			
+			logger.info("BATCH MEDIA : " + batch.getMediaId());
+			logger.info("BATCH MEDIA PATH : " + batch.getOriginalFilePath() + batch.getOriginalFileName());
+			
+			batch.setStatus(EncodingStatus.ENCODING.getName());
+			batchRepository.save(batch);
+			
+			String input = batch.getOriginalFilePath() + batch.getOriginalFileName();
+			String output = batch.getEncodingFilePath() + batch.getEncodingFileName();
+			
+			File outputDir = new File(batch.getEncodingFilePath());
+			
+			if(!outputDir.exists()) {
+				outputDir.mkdirs();
+			}
+			
+			List<String> list = new ArrayList();
+			
+			list.add(ffmpegEncoderPath + "ffmpeg.exe");
+			list.add("-y");
+			
+			list.add("-loglevel");
+			list.add("info");
+			
+			list.add("-strict");
+			list.add("experimental");
+			
+			list.add("-i");
+			list.add(input);
+			
+			list.add("-ab");
+			list.add("192k");
+			
+			list.add("-ac");
+			list.add("2");
+			
+			list.add(output);
+			
+			logger.info("AUDIO ENCODING PARAM LIST : " + list);
+			
+			ProcessBuilder pb = new ProcessBuilder(list);
+			pb.redirectErrorStream(true);
+			
+			//타겟 하나 잡기
+			Process process = pb.start();
+			
+			InputStreamReader in = new InputStreamReader(process.getInputStream());
+			BufferedReader br = new BufferedReader(in);
+			
+			String line = "";
+			while((line = br.readLine()) != null) {
+				logger.info("line : " + line);				
+			}
+			
+			int exitValue = process.exitValue();				
+			if(exitValue != 0) {					
+				logger.error("FFMPEG encoding exitValue : " + exitValue);
+				encodingFail(batch);
+				return;
+			}else {
+				
+				batch.setStatus(EncodingStatus.SUCCESS.getName());
+				batchRepository.save(batch);
+				
+				String returnUrl = batch.getReturnUrl();
+				if(returnUrl != null && !returnUrl.equals("")) {
+					encodingSuccess(batch);
+				}				
+				
+			}
+		
+		}catch(IOException e) {
+			logger.info("ERROR : " + e);
+			encodingFail(batch);
+		};
 		
 	}
 	
@@ -222,7 +302,7 @@ public class SchedService {
 			
 			List<String> list = new ArrayList();
 			
-			list.add(encoderPath + "magick.exe");
+			list.add(imageEncoderPath + "magick.exe");
 			list.add(input);
 			list.add(output);
 			
