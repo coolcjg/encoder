@@ -132,8 +132,6 @@ public class SchedService {
 			
 			String line = "";
 			while((line = br.readLine()) != null) {
-				logger.info("line : " + line);
-				
 				if(line != null && line.contains("frame=")){
 					encodingPercent(batch, frames, line);
 				}
@@ -253,8 +251,7 @@ public class SchedService {
 			BufferedReader br = new BufferedReader(in);
 			
 			String line = "";
-			while((line = br.readLine()) != null) {
-				logger.info("line : " + line);				
+			while((line = br.readLine()) != null) {				
 			}
 			
 			int exitValue = process.exitValue();				
@@ -319,7 +316,6 @@ public class SchedService {
 			
 			String line = "";
 			while((line = br.readLine()) != null) {
-				logger.info("line : " + line);			
 			}
 			
 			int exitValue = process.exitValue();
