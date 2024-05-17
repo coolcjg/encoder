@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cjg.sonata.domain.Gallery;
+import com.cjg.sonata.dto.GalleryDTO;
+import com.cjg.sonata.repository.GalleryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,9 @@ public class SchedService {
 	
 	@Autowired
 	BatchRepository batchRepository;
+
+	@Autowired
+	GalleryRepository galleryRepository;
 	
 	@Autowired
 	HttpRequestUtil httpRequestUtil;
@@ -184,6 +190,8 @@ public class SchedService {
 				
 				String returnUrl = batch.getReturnUrl();
 				if(returnUrl != null && !returnUrl.equals("")) {
+
+					insertGallery(setGalleryParam(batch));
 					encodingSuccess(batch);
 				}
 				
@@ -196,6 +204,22 @@ public class SchedService {
 			encodingFail(batch);
 		};
 		
+	}
+
+	public Gallery setGalleryParam(Batch batch){
+
+		//기본 파라미터 설정
+		Gallery gallery = new Gallery();
+		gallery.setMediaId(batch.getMediaId());
+		gallery.setType(batch.getType());
+		gallery.setThumbnailFilePath(batch.getEncodingFilePath());
+		gallery.setThumbnailFileName(batch.getMediaId() + ".jpg");
+
+		gallery.setEncodingFilePath(batch.getEncodingFilePath());
+		gallery.setEncodingFileName(batch.getEncodingFileName());
+
+		return gallery;
+
 	}
 	
 	private void encodingAudio(Batch batch) {
@@ -327,6 +351,7 @@ public class SchedService {
 				
 				String returnUrl = batch.getReturnUrl();
 				if(returnUrl != null && !returnUrl.equals("")) {
+					insertGallery(setGalleryParam(batch));
 					encodingSuccess(batch);
 				}
 				
@@ -383,6 +408,10 @@ public class SchedService {
 		
 		httpRequestUtil.encodingRequest(batch.getReturnUrl(), param);
 		
+	}
+
+	private void insertGallery(Gallery gallery){
+		galleryRepository.save(gallery);
 	}
 
 }
