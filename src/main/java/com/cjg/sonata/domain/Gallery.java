@@ -35,7 +35,7 @@ public class Gallery {
     private String status;
 
     @JsonFormat(pattern="yyyy-MM-dd hh:mm")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime completeDate;
 
     @Column(nullable = false, length = 40)

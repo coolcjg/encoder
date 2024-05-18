@@ -3,18 +3,25 @@ package com.cjg.sonata.sched;
 
 import com.cjg.sonata.domain.Batch;
 import com.cjg.sonata.domain.Gallery;
+import com.cjg.sonata.repository.GalleryRepository;
 import com.cjg.sonata.service.SchedService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 public class SchedServiceTest {
 
     @InjectMocks
     SchedService schedService;
+
+    @Mock
+    GalleryRepository galleryRepository;
 
     @Test
     public void setGalleryParamTest_videoInput(){
@@ -53,6 +60,20 @@ public class SchedServiceTest {
         Assertions.assertEquals("/test/upload/encoding/2024/05/01", gallery.getEncodingFilePath());
         Assertions.assertEquals("1.jpg", gallery.getEncodingFileName());
     }
+
+    @Test
+    public void insertGallery(){
+
+        Gallery gallery = new Gallery();
+
+        given(galleryRepository.save(gallery)).willReturn(gallery);
+
+        Gallery savedGallery = schedService.insertGallery(gallery);
+
+        Assertions.assertEquals(gallery, savedGallery);
+    }
+
+
 
 
 }

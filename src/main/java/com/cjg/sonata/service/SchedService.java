@@ -218,6 +218,8 @@ public class SchedService {
 		gallery.setEncodingFilePath(batch.getEncodingFilePath());
 		gallery.setEncodingFileName(batch.getEncodingFileName());
 
+		gallery.setStatus("N");
+
 		return gallery;
 
 	}
@@ -410,8 +412,8 @@ public class SchedService {
 		
 	}
 
-	private void insertGallery(Gallery gallery){
-		galleryRepository.save(gallery);
+	public Gallery insertGallery(Gallery gallery){
+		return galleryRepository.save(gallery);
 	}
 
 }
