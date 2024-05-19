@@ -12,6 +12,7 @@ import java.util.Map;
 import com.cjg.sonata.domain.Gallery;
 import com.cjg.sonata.dto.GalleryDTO;
 import com.cjg.sonata.repository.GalleryRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
 
 @Service
+@RequiredArgsConstructor
 public class SchedService {
 	
 	Logger logger = LoggerFactory.getLogger(SchedService.class);
@@ -36,7 +38,7 @@ public class SchedService {
 	private String ffmpegEncoderPath;
 	
 	@Value("${imageEncoderPath}")
-	private String imageEncoderPath;	
+	private String imageEncoderPath;
 	
 	@Autowired
 	BatchRepository batchRepository;
@@ -212,10 +214,13 @@ public class SchedService {
 		Gallery gallery = new Gallery();
 		gallery.setMediaId(batch.getMediaId());
 		gallery.setType(batch.getType());
-		gallery.setThumbnailFilePath(batch.getEncodingFilePath());
+
+		int index  = batch.getEncodingFilePath().lastIndexOf("/upload/") + 7;
+
+		gallery.setThumbnailFilePath(batch.getEncodingFilePath().substring(index));
 		gallery.setThumbnailFileName(batch.getMediaId() + ".jpg");
 
-		gallery.setEncodingFilePath(batch.getEncodingFilePath());
+		gallery.setEncodingFilePath(batch.getEncodingFilePath().substring(index));
 		gallery.setEncodingFileName(batch.getEncodingFileName());
 
 		gallery.setStatus("N");
