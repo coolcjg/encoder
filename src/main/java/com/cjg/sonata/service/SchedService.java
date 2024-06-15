@@ -1,5 +1,22 @@
 package com.cjg.sonata.service;
 
+import com.cjg.sonata.common.EncodingStatus;
+import com.cjg.sonata.common.HttpRequestUtil;
+import com.cjg.sonata.domain.Batch;
+import com.cjg.sonata.domain.Gallery;
+import com.cjg.sonata.repository.BatchRepository;
+import com.cjg.sonata.repository.GalleryRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.probe.FFmpegProbeResult;
+import net.bramp.ffmpeg.probe.FFmpegStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -9,34 +26,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cjg.sonata.domain.Gallery;
-import com.cjg.sonata.dto.GalleryDTO;
-import com.cjg.sonata.repository.GalleryRepository;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.cjg.sonata.common.EncodingStatus;
-import com.cjg.sonata.common.HttpRequestUtil;
-import com.cjg.sonata.domain.Batch;
-import com.cjg.sonata.repository.BatchRepository;
-
-import net.bramp.ffmpeg.FFprobe;
-import net.bramp.ffmpeg.probe.FFmpegProbeResult;
-import net.bramp.ffmpeg.probe.FFmpegStream;
-
 @Service
 @RequiredArgsConstructor
 public class SchedService {
 	
 	Logger logger = LoggerFactory.getLogger(SchedService.class);
-	
+
+	@Setter
 	@Value("${ffmpegEncoderPath}")
 	private String ffmpegEncoderPath;
-	
+
+	@Setter
 	@Value("${imageEncoderPath}")
 	private String imageEncoderPath;
 	
@@ -375,7 +375,7 @@ public class SchedService {
 	
 	
 	
-	private void encodingFail(Batch batch) {
+	public void encodingFail(Batch batch) {
 		batch.setStatus(EncodingStatus.FAIL.getName());
 		batchRepository.save(batch);
 		

@@ -1,20 +1,17 @@
 package com.cjg.sonata.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.cjg.sonata.common.EncodingStatus;
-import com.cjg.sonata.common.FFprobeUtil;
 import com.cjg.sonata.domain.Batch;
 import com.cjg.sonata.dto.BatchDTO;
 import com.cjg.sonata.repository.BatchRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -25,13 +22,8 @@ public class ApiService {
 	@Autowired
 	BatchRepository batchRepository;
 	
-	@Autowired
-	FFprobeUtil ffprobeUtil;	
-	
 	public Map<String, Object> batchInsert(BatchDTO batchDTO){
-		
-		logger.info("batchInsert batchDTO : " + batchDTO.toString());
-		
+
 		Map<String, Object> result = new HashMap<String, Object>();
 		String type = batchDTO.getType();
 		
@@ -60,7 +52,6 @@ public class ApiService {
 		
 		batchRepository.save(batch);
 
-		result.put("code", HttpStatus.CREATED.value());
 		result.put("message", "success");
 		
 		return result;
