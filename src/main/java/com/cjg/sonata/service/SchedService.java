@@ -33,8 +33,12 @@ public class SchedService {
 	Logger logger = LoggerFactory.getLogger(SchedService.class);
 
 	@Setter
-	@Value("${ffmpegEncoderPath}")
-	private String ffmpegEncoderPath;
+	@Value("${ffmpegPath}")
+	private String ffmpegPath;
+
+	@Setter
+	@Value("${ffprobePath}")
+	private String ffprobePath;
 
 	@Setter
 	@Value("${imageEncoderPath}")
@@ -77,7 +81,7 @@ public class SchedService {
 			
 			Long frames = 0l;
 			
-			FFprobe ffprobe = new FFprobe(ffmpegEncoderPath + "ffprobe.exe");
+			FFprobe ffprobe = new FFprobe(ffprobePath);
 			FFmpegProbeResult probeResult = ffprobe.probe(batch.getOriginalFilePath() + batch.getOriginalFileName());
 			FFmpegStream stream = probeResult.getStreams().get(0);
 			frames = stream.nb_frames;
@@ -101,7 +105,7 @@ public class SchedService {
 			
 			List<String> list = new ArrayList();
 			
-			list.add(ffmpegEncoderPath + "ffmpeg.exe");
+			list.add(ffmpegPath);
 			list.add("-y");
 			
 			list.add("-loglevel");
@@ -155,7 +159,7 @@ public class SchedService {
 			
 			List<String> thumbnailArgList = new ArrayList();
 			
-			thumbnailArgList.add(ffmpegEncoderPath + "ffmpeg.exe");
+			thumbnailArgList.add(ffmpegPath);
 			thumbnailArgList.add("-y");
 			
 			thumbnailArgList.add("-loglevel");
@@ -250,7 +254,7 @@ public class SchedService {
 			
 			List<String> list = new ArrayList();
 			
-			list.add(ffmpegEncoderPath + "ffmpeg.exe");
+			list.add(ffmpegPath);
 			list.add("-y");
 			
 			list.add("-loglevel");

@@ -54,7 +54,8 @@ public class SchedServiceTest {
 
         given(batchRepository.findAllByStatusOrderByRegDateAsc(EncodingStatus.WAITING.getName())).willReturn(batchList);
 
-        schedService.setFfmpegEncoderPath(TestPropertyUtil.ffmpegEncoderPath);
+        schedService.setFfmpegPath(TestPropertyUtil.ffmpegPath);
+        schedService.setFfprobePath(TestPropertyUtil.ffprobePath);
         schedService.encoding();
 
     }
@@ -79,7 +80,8 @@ public class SchedServiceTest {
 
         given(batchRepository.findAllByStatusOrderByRegDateAsc(EncodingStatus.WAITING.getName())).willReturn(batchList);
 
-        schedService.setFfmpegEncoderPath(TestPropertyUtil.ffmpegEncoderPath);
+        schedService.setFfmpegPath(TestPropertyUtil.ffmpegPath);
+        schedService.setFfprobePath(TestPropertyUtil.ffprobePath);
         schedService.encoding();
 
     }

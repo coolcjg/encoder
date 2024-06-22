@@ -17,7 +17,8 @@ public class FFprobeUtilTest {
     @Test
     @DisplayName("getType")
     public void getType(){
-        ffprobeUtil.setFfmpegEncoderPath(TestPropertyUtil.ffmpegEncoderPath);
+        ffprobeUtil.setFfmpegPath(TestPropertyUtil.ffmpegPath);
+        ffprobeUtil.setFfprobePath(TestPropertyUtil.ffprobePath);
         String result = ffprobeUtil.getType("D:/NAS/uploadTest/video.mp4");
         Assertions.assertThat(result).isEqualTo("video");
 

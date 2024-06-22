@@ -21,8 +21,12 @@ public class FFprobeUtil {
 	final String[] AUDIO_CODEC = {"aac", "mp3"};
 
 	@Setter
-	@Value("${ffmpegEncoderPath}")
-	private String ffmpegEncoderPath;
+	@Value("${ffmpegPath}")
+	private String ffmpegPath;
+
+	@Setter
+	@Value("${ffprobePath}")
+	private String ffprobePath;
 
 	public String getType(String path) {
 
@@ -30,7 +34,7 @@ public class FFprobeUtil {
 
 		try {
 
-			FFprobe ffprobe = new FFprobe(ffmpegEncoderPath + "ffprobe.exe");
+			FFprobe ffprobe = new FFprobe(ffprobePath);
 
 			FFmpegProbeResult probeResult = ffprobe.probe(path);
 
