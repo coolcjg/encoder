@@ -4,6 +4,7 @@ import com.cjg.sonata.dto.BatchDTO;
 import com.cjg.sonata.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,11 @@ public class ApiController {
 	@PostMapping("/batch")
 	public Map<String, Object> batchInsert(BatchDTO batchDTO){
 		return apiService.batchInsert(batchDTO);
+	}
+
+	@GetMapping("/")
+	public String home(){
+		return "Hello World";
 	}
 	
 	
