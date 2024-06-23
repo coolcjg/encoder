@@ -68,6 +68,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{steps.task-def.outputs.task-definition}}
-          service: service-encoder-1 #클러스터 서비스 명
+          service: service-encoder #클러스터 서비스 명
           cluster: cluster-encoder # 클러스터 명
           wait-for-service-stability: true
