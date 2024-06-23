@@ -8,6 +8,9 @@ COPY ${JAR_FILE} app.jar
 COPY ${FFMPEG_PATH} /encoder/ffmpeg
 COPY ${FFPROBE_PATH} /encoder/ffprobe
 
+RUN chmod 777 /encoder
+RUN chmod 777 /encoder
+
 RUN chmod 777 /encoder/ffmpeg
 RUN chmod 777 /encoder/ffprobe
 
