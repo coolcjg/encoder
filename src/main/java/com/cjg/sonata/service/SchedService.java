@@ -85,6 +85,35 @@ public class SchedService {
 
 			if(file.isFile()){
 				System.out.printf("ffprobePath FILE OK");
+
+				List<String> list = new ArrayList();
+
+				list.add(ffprobePath);
+				list.add("-show_streams");
+				list.add(batch.getOriginalFilePath() + batch.getOriginalFileName());
+
+				logger.info("VIDEO FFPROBE PARAM LIST : " + list);
+
+				ProcessBuilder pb = new ProcessBuilder(list);
+				pb.redirectErrorStream(true);
+
+				//타겟 하나 잡기
+				Process process = pb.start();
+
+				InputStreamReader in = new InputStreamReader(process.getInputStream());
+				BufferedReader br = new BufferedReader(in);
+
+				String line = "";
+				while((line = br.readLine()) != null) {
+					System.out.println(line);
+				}
+
+				int exitValue = process.exitValue();
+				if(exitValue != 0) {
+					logger.error("FFMPEG FFPROBE exitValue : " + exitValue);
+					encodingFail(batch);
+					return;
+				}
 			}else{
 				System.out.printf("ffprobePath FILE FAIL");
 			}
