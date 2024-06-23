@@ -80,6 +80,14 @@ public class SchedService {
 		try {
 			
 			Long frames = 0l;
+
+			File file = new File(ffprobePath);
+
+			if(file.isFile()){
+				System.out.printf("ffprobePath FILE OK");
+			}else{
+				System.out.printf("ffprobePath FILE FAIL");
+			}
 			
 			FFprobe ffprobe = new FFprobe(ffprobePath);
 			FFmpegProbeResult probeResult = ffprobe.probe(batch.getOriginalFilePath() + batch.getOriginalFileName());
