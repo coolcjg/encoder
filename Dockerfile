@@ -8,8 +8,8 @@ COPY ${JAR_FILE} app.jar
 COPY ${FFMPEG_PATH} /encoder/ffmpeg
 COPY ${FFPROBE_PATH} /encoder/ffprobe
 
-RUN chmod 764 build/resources/main/encoder/ffmpeg
-RUN chmod 764 build/resources/main/encoder/ffprobe
+RUN chmod 764 /encoder/ffmpeg
+RUN chmod 764 /encoder/ffprobe
 
 EXPOSE 5000
 ENTRYPOINT ["java","-jar", "-Dspring.profiles.active=prod", "/app.jar"]
