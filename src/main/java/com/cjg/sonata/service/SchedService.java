@@ -77,6 +77,9 @@ public class SchedService {
 	
 	private void encodingVideo(Batch batch) {
 		
+		
+		/*테스트*/
+		
 		try {
 			
 			Long frames = 0l;
