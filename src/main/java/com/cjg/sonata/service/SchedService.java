@@ -57,19 +57,17 @@ public class SchedService {
 		
 		List<Batch> batchList = batchRepository.findAllByStatusOrderByRegDateAsc(EncodingStatus.WAITING.getName());
 		
-		if(batchList == null || batchList.size() == 0) {
+		if(batchList == null || batchList.isEmpty()) {
 			return;		
 		}
 		
 		for(Batch batch : batchList) {
-			
-			if(batch.getType().equals("video")) {
-				encodingVideo(batch);
-			}else if(batch.getType().equals("audio")) {
-				encodingAudio(batch);
-			}else if(batch.getType().equals("image")) {
-				encodingImage(batch);
-			}
+
+            switch (batch.getType()) {
+                case "video" -> encodingVideo(batch);
+                case "audio" -> encodingAudio(batch);
+                case "image" -> encodingImage(batch);
+            }
 			
 		}
 		
@@ -82,45 +80,8 @@ public class SchedService {
 		
 		try {
 			
-			Long frames = 0l;
+			Long frames = 0L;
 
-			File file = new File(ffprobePath);
-
-			if(file.isFile()){
-				System.out.printf("ffprobePath FILE OK");
-
-				List<String> list = new ArrayList();
-
-				list.add(ffprobePath);
-				list.add("-show_streams");
-				list.add(batch.getOriginalFilePath() + batch.getOriginalFileName());
-
-				logger.info("VIDEO FFPROBE PARAM LIST : " + list);
-
-				ProcessBuilder pb = new ProcessBuilder(list);
-				pb.redirectErrorStream(true);
-
-				//타겟 하나 잡기
-				Process process = pb.start();
-
-				InputStreamReader in = new InputStreamReader(process.getInputStream());
-				BufferedReader br = new BufferedReader(in);
-
-				String line = "";
-				while((line = br.readLine()) != null) {
-					System.out.println(line);
-				}
-
-				int exitValue = process.exitValue();
-				if(exitValue != 0) {
-					logger.error("FFMPEG FFPROBE exitValue : " + exitValue);
-					encodingFail(batch);
-					return;
-				}
-			}else{
-				System.out.printf("ffprobePath FILE FAIL");
-			}
-			
 			FFprobe ffprobe = new FFprobe(ffprobePath);
 			FFmpegProbeResult probeResult = ffprobe.probe(batch.getOriginalFilePath() + batch.getOriginalFileName());
 			FFmpegStream stream = probeResult.getStreams().get(0);
@@ -143,7 +104,7 @@ public class SchedService {
 				outputDir.mkdirs();
 			}
 			
-			List<String> list = new ArrayList();
+			List<String> list = new ArrayList<String>();
 			
 			list.add(ffmpegPath);
 			list.add("-y");
@@ -178,18 +139,20 @@ public class SchedService {
 			
 			//타겟 하나 잡기
 			Process process = pb.start();
-			
+
 			InputStreamReader in = new InputStreamReader(process.getInputStream());
 			BufferedReader br = new BufferedReader(in);
 			
 			String line = "";
 			while((line = br.readLine()) != null) {
-				if(line != null && line.contains("frame=")){
+				if(line.contains("frame=")){
 					encodingPercent(batch, frames, line);
 				}
 				
 			}
-			
+
+			process.waitFor();
+
 			int exitValue = process.exitValue();				
 			if(exitValue != 0) {					
 				logger.error("FFMPEG encoding exitValue : " + exitValue);
@@ -197,7 +160,7 @@ public class SchedService {
 				return;
 			}
 			
-			List<String> thumbnailArgList = new ArrayList();
+			List<String> thumbnailArgList = new ArrayList<String>();
 			
 			thumbnailArgList.add(ffmpegPath);
 			thumbnailArgList.add("-y");
@@ -235,7 +198,7 @@ public class SchedService {
 				batchRepository.save(batch);
 				
 				String returnUrl = batch.getReturnUrl();
-				if(returnUrl != null && !returnUrl.equals("")) {
+				if(returnUrl != null && !returnUrl.isEmpty()) {
 
 					insertGallery(setGalleryParam(batch));
 					encodingSuccess(batch);
@@ -248,7 +211,7 @@ public class SchedService {
 		}catch(IOException | InterruptedException e ) {
 			logger.info("ERROR : " + e);
 			encodingFail(batch);
-		};
+		}
 		
 	}
 
@@ -292,7 +255,7 @@ public class SchedService {
 				outputDir.mkdirs();
 			}
 			
-			List<String> list = new ArrayList();
+			List<String> list = new ArrayList<String>();
 			
 			list.add(ffmpegPath);
 			list.add("-y");
@@ -321,13 +284,16 @@ public class SchedService {
 			
 			//타겟 하나 잡기
 			Process process = pb.start();
-			
+
 			InputStreamReader in = new InputStreamReader(process.getInputStream());
 			BufferedReader br = new BufferedReader(in);
-			
+
 			String line = "";
-			while((line = br.readLine()) != null) {				
+			while((line = br.readLine()) != null) {
+				logger.info("audio encoding : " + line);
 			}
+
+			process.waitFor();
 			
 			int exitValue = process.exitValue();				
 			if(exitValue != 0) {					
@@ -346,7 +312,7 @@ public class SchedService {
 				
 			}
 		
-		}catch(IOException e) {
+		}catch(IOException | InterruptedException e) {
 			logger.info("ERROR : " + e);
 			encodingFail(batch);
 		};
@@ -374,7 +340,7 @@ public class SchedService {
 			
 			List<String> list = new ArrayList();
 			
-			list.add(imageEncoderPath + "magick.exe");
+			list.add(imageEncoderPath);
 			list.add(input);
 			list.add(output);
 			
@@ -392,6 +358,8 @@ public class SchedService {
 			String line = "";
 			while((line = br.readLine()) != null) {
 			}
+
+			process.waitFor();
 			
 			int exitValue = process.exitValue();
 
@@ -410,7 +378,7 @@ public class SchedService {
 				encodingFail(batch);
 			}
 		
-		}catch(IOException e) {
+		}catch(IOException | InterruptedException e) {
 			logger.info("ERROR : " + e);
 			encodingFail(batch);
 		};		
