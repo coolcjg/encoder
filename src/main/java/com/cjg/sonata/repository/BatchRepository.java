@@ -14,4 +14,6 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
 	
 	List<Batch> findAllByStatusOrderByRegDateAsc(String status);
 
+	Batch findByMediaId(Long mediaId);
+
 }

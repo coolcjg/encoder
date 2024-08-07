@@ -4,6 +4,7 @@ import com.cjg.sonata.common.EncodingStatus;
 import com.cjg.sonata.common.HttpRequestUtil;
 import com.cjg.sonata.domain.Batch;
 import com.cjg.sonata.domain.Gallery;
+import com.cjg.sonata.dto.BatchDTO;
 import com.cjg.sonata.repository.BatchRepository;
 import com.cjg.sonata.repository.GalleryRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,9 @@ public class SchedService {
 	
 	@Autowired
 	HttpRequestUtil httpRequestUtil;
+
+	@Autowired
+	ApiService apiService;
 	
 	public void encoding() {
 		
@@ -71,6 +75,23 @@ public class SchedService {
 			
 		}
 		
+	}
+
+	public void encoding(BatchDTO batchDTO) {
+
+		apiService.batchInsert(batchDTO);
+		Batch batch = batchRepository.findByMediaId(batchDTO.getMediaId());
+
+		if(batch == null) {
+			return;
+		}
+
+		switch (batch.getType()) {
+			case "video" -> encodingVideo(batch);
+			case "audio" -> encodingAudio(batch);
+			case "image" -> encodingImage(batch);
+		}
+
 	}
 	
 	private void encodingVideo(Batch batch) {
