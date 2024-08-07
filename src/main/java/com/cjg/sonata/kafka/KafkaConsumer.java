@@ -27,7 +27,7 @@ public class KafkaConsumer {
 		schedService.encoding(convert(value));
 	}
 
-	private BatchDTO convert(String value){
+	public BatchDTO convert(String value){
 
 		BatchDTO batchDto = new BatchDTO();
 		JsonObject jo = JsonParser.parseString(value).getAsJsonObject();

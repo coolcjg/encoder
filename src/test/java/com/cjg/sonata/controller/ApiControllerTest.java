@@ -5,6 +5,7 @@ import com.cjg.sonata.dto.BatchDTO;
 import com.cjg.sonata.service.ApiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.security.SecurityConfig;
+import org.aspectj.weaver.World;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,10 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(
         controllers = ApiController.class
@@ -67,4 +68,16 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.message").value("success"))
                 .andDo(print());
     }
+
+
+    @Test
+    @DisplayName("hello world")
+    public void home() throws Exception{
+        mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Hello World!"))
+                .andDo(print());
+    }
+
+
 }

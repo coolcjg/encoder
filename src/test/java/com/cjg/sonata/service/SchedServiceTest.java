@@ -5,8 +5,8 @@ import com.cjg.sonata.common.EncodingStatus;
 import com.cjg.sonata.common.HttpRequestUtil;
 import com.cjg.sonata.common.TestPropertyUtil;
 import com.cjg.sonata.domain.Batch;
+import com.cjg.sonata.dto.BatchDTO;
 import com.cjg.sonata.repository.BatchRepository;
-import com.cjg.sonata.repository.GalleryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,16 +32,17 @@ public class SchedServiceTest {
     SchedService schedService;
 
     @Mock
-    GalleryRepository galleryRepository;
+    ApiService apiService;
 
     @Test
     @DisplayName("encoding_video")
-    public void encoding_video() {
+    public void encoding_video(){
 
-        List<Batch> batchList = new ArrayList();
+        BatchDTO batchDTO = new BatchDTO();
+        batchDTO.setMediaId(1L);
 
         Batch batch = new Batch();
-        batch.setMediaId(1L);
+        batch.setMediaId(batchDTO.getMediaId());
         batch.setType("video");
         batch.setReturnUrl("https://cjg.com");
         batch.setOriginalFilePath("D:/NAS/uploadTest/");
@@ -50,13 +51,11 @@ public class SchedServiceTest {
         batch.setEncodingFilePath("D:/NAS/uploadTest/");
         batch.setEncodingFileName("video_enc.mp4");
 
-        batchList.add(batch);
-
-        given(batchRepository.findAllByStatusOrderByRegDateAsc(EncodingStatus.WAITING.getName())).willReturn(batchList);
+        given(batchRepository.findByMediaId(1L)).willReturn(batch);
 
         schedService.setFfmpegPath(TestPropertyUtil.ffmpegPath);
         schedService.setFfprobePath(TestPropertyUtil.ffprobePath);
-        schedService.encoding();
+        schedService.encoding(batchDTO);
 
     }
 
@@ -64,7 +63,8 @@ public class SchedServiceTest {
     @DisplayName("encoding_audio")
     public void encoding_audio() {
 
-        List<Batch> batchList = new ArrayList();
+        BatchDTO batchDTO = new BatchDTO();
+        batchDTO.setMediaId(2L);
 
         Batch batch = new Batch();
         batch.setMediaId(2L);
@@ -76,13 +76,11 @@ public class SchedServiceTest {
         batch.setEncodingFilePath("D:/NAS/uploadTest/");
         batch.setEncodingFileName("audio_enc.mp3");
 
-        batchList.add(batch);
-
-        given(batchRepository.findAllByStatusOrderByRegDateAsc(EncodingStatus.WAITING.getName())).willReturn(batchList);
+        given(batchRepository.findByMediaId(2L)).willReturn(batch);
 
         schedService.setFfmpegPath(TestPropertyUtil.ffmpegPath);
         schedService.setFfprobePath(TestPropertyUtil.ffprobePath);
-        schedService.encoding();
+        schedService.encoding(batchDTO);
 
     }
 
@@ -90,7 +88,8 @@ public class SchedServiceTest {
     @DisplayName("encoding_image")
     public void encoding_image() {
 
-        List<Batch> batchList = new ArrayList();
+        BatchDTO batchDTO = new BatchDTO();
+        batchDTO.setMediaId(3L);
 
         Batch batch = new Batch();
         batch.setMediaId(3L);
@@ -102,12 +101,10 @@ public class SchedServiceTest {
         batch.setEncodingFilePath("D:/NAS/uploadTest/");
         batch.setEncodingFileName("image_enc.jpg");
 
-        batchList.add(batch);
-
-        given(batchRepository.findAllByStatusOrderByRegDateAsc(EncodingStatus.WAITING.getName())).willReturn(batchList);
+        given(batchRepository.findByMediaId(3L)).willReturn(batch);
 
         schedService.setImageEncoderPath(TestPropertyUtil.imageEncoderPath);
-        schedService.encoding();
+        schedService.encoding(batchDTO);
 
     }
 

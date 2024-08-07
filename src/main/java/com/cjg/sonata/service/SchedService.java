@@ -3,10 +3,8 @@ package com.cjg.sonata.service;
 import com.cjg.sonata.common.EncodingStatus;
 import com.cjg.sonata.common.HttpRequestUtil;
 import com.cjg.sonata.domain.Batch;
-import com.cjg.sonata.domain.Gallery;
 import com.cjg.sonata.dto.BatchDTO;
 import com.cjg.sonata.repository.BatchRepository;
-import com.cjg.sonata.repository.GalleryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.bramp.ffmpeg.FFprobe;
@@ -47,35 +45,12 @@ public class SchedService {
 	
 	@Autowired
 	BatchRepository batchRepository;
-
-	@Autowired
-	GalleryRepository galleryRepository;
 	
 	@Autowired
 	HttpRequestUtil httpRequestUtil;
 
 	@Autowired
 	ApiService apiService;
-	
-	public void encoding() {
-		
-		List<Batch> batchList = batchRepository.findAllByStatusOrderByRegDateAsc(EncodingStatus.WAITING.getName());
-		
-		if(batchList == null || batchList.isEmpty()) {
-			return;		
-		}
-		
-		for(Batch batch : batchList) {
-
-            switch (batch.getType()) {
-                case "video" -> encodingVideo(batch);
-                case "audio" -> encodingAudio(batch);
-                case "image" -> encodingImage(batch);
-            }
-			
-		}
-		
-	}
 
 	public void encoding(BatchDTO batchDTO) {
 
@@ -220,8 +195,6 @@ public class SchedService {
 				
 				String returnUrl = batch.getReturnUrl();
 				if(returnUrl != null && !returnUrl.isEmpty()) {
-
-					insertGallery(setGalleryParam(batch));
 					encodingSuccess(batch);
 				}
 				
@@ -234,27 +207,6 @@ public class SchedService {
 			encodingFail(batch);
 		}
 		
-	}
-
-	public Gallery setGalleryParam(Batch batch){
-
-		//기본 파라미터 설정
-		Gallery gallery = new Gallery();
-		gallery.setMediaId(batch.getMediaId());
-		gallery.setType(batch.getType());
-
-		int index  = batch.getEncodingFilePath().lastIndexOf("/upload/") + 7;
-
-		gallery.setThumbnailFilePath(batch.getEncodingFilePath().substring(index));
-		gallery.setThumbnailFileName(batch.getMediaId() + ".jpg");
-
-		gallery.setEncodingFilePath(batch.getEncodingFilePath().substring(index));
-		gallery.setEncodingFileName(batch.getEncodingFileName());
-
-		gallery.setStatus("N");
-
-		return gallery;
-
 	}
 	
 	private void encodingAudio(Batch batch) {
@@ -391,7 +343,6 @@ public class SchedService {
 				
 				String returnUrl = batch.getReturnUrl();
 				if(returnUrl != null && !returnUrl.equals("")) {
-					insertGallery(setGalleryParam(batch));
 					encodingSuccess(batch);
 				}
 				
@@ -448,10 +399,6 @@ public class SchedService {
 		
 		httpRequestUtil.encodingRequest(batch.getReturnUrl(), param);
 		
-	}
-
-	public Gallery insertGallery(Gallery gallery){
-		return galleryRepository.save(gallery);
 	}
 
 }
