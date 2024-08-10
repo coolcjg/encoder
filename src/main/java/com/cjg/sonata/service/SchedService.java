@@ -286,7 +286,6 @@ public class SchedService {
 				
 				String returnUrl = batch.getReturnUrl();
 				if(returnUrl != null && !returnUrl.equals("")) {
-					insertGallery(setGalleryParam(batch));
 					encodingSuccess(batch);
 				}				
 				
@@ -351,6 +350,7 @@ public class SchedService {
 				String returnUrl = batch.getReturnUrl();
 				if(returnUrl != null && !returnUrl.equals("")) {
 					encodingSuccess(batch);
+					insertGallery(setGalleryParam(batch));
 				}
 				
 			}else {
