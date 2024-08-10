@@ -7,6 +7,7 @@ import com.cjg.sonata.common.TestPropertyUtil;
 import com.cjg.sonata.domain.Batch;
 import com.cjg.sonata.dto.BatchDTO;
 import com.cjg.sonata.repository.BatchRepository;
+import com.cjg.sonata.repository.GalleryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,9 @@ public class SchedServiceTest {
 
     @InjectMocks
     SchedService schedService;
+
+    @Mock
+    GalleryRepository galleryRepository;
 
     @Mock
     ApiService apiService;
